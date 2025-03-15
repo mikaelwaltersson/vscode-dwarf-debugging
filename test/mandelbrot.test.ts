@@ -1,7 +1,8 @@
-import * as assert from 'assert';
+import assert from 'assert';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
+
 import { IWasmWorker, spawn } from '../dist';
 
 // This test with mandelbrot.wasm which was pulled from https://emscripten-dbg-stories.netlify.app/mandelbrot.html
@@ -10,7 +11,13 @@ describe('dwarf-debugging', () => {
   let s: IWasmWorker;
 
   beforeEach(() => {
-    s = spawn({} as any);
+    s = spawn({
+      getWasmLinearMemory: async (offset, length, stopId) => new ArrayBuffer(0),
+      getWasmLocal: async (local, stopId) => ({ type: 'i32', value: 0 }),
+      getWasmGlobal: async (global, stopId) => ({ type: 'i32', value: 0 }),
+      getWasmOp: async (op, stopId) => ({ type: 'i32', value: 0 }),
+      reportResourceLoad: async (resourceUrl, status) => { }
+    });
   });
 
   afterEach(async () => {
